@@ -1,15 +1,20 @@
 <template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginFormRules" class="login-form" auto-complete="on" label-position="left">
+      <!-- 图片 -->
       <div class="title-container">
         <h3 class="title">
           <img src="@/assets/common/login-logo.png" alt="">
         </h3>
       </div>
+
+      <!--! 账号 -->
       <el-form-item prop="mobile">
         <span class="svg-container el-icon-user-solid" />
         <el-input v-model="loginForm.mobile" />
       </el-form-item>
+
+      <!--! 密码 -->
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
@@ -20,6 +25,7 @@
         </span>
       </el-form-item>
 
+      <!--! 登录按钮 -->
       <el-button class="loginBtn" :loading="loading" @click="login">登 录</el-button>
       <div class="tips">
         <span style="margin-right:20px;">账号: 13800000002</span>
