@@ -12,15 +12,15 @@
         <el-col style="margin-right: 8px;">{{ treeNode.manager }}</el-col>
         <el-col>
           <!-- 下拉菜单 element -->
-          <el-dropdown>
+          <el-dropdown @command="handCommand">
             <span>
               操作<i class="el-icon-arrow-down el-icon--right" />
             </span>
             <!-- 下拉菜单 -->
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>添加子部门</el-dropdown-item>
-              <el-dropdown-item v-if="isRoot">编辑部门</el-dropdown-item>
-              <el-dropdown-item v-if="isRoot">删除部门</el-dropdown-item>
+              <el-dropdown-item command="add">添加子部门</el-dropdown-item>
+              <el-dropdown-item v-if="isRoot" command="edit">编辑部门</el-dropdown-item>
+              <el-dropdown-item v-if="isRoot" command="del">删除部门</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-col>
@@ -41,6 +41,19 @@ export default {
     isRoot: { // isRoot 来控制 编辑部门 和 删除部门 的 显示 隐藏
       type: Boolean,
       default: true // 默认显示
+    }
+  },
+  methods: {
+    handCommand(type) {
+      console.log(type)
+      if (type === 'add') {
+        // add新增
+        this.$emit('addDept', this.treeNode)
+      } else if (type === 'edit') {
+        // edit编辑
+      } else {
+        // del
+      }
     }
   }
 }
