@@ -13,8 +13,8 @@
       </el-form-item>
 
       <el-form-item label="部门负责人" prop="manager">
-        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择">
-          <el-option label="username11" value="username" />
+        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择" @focus="getEmployeeSimple">
+          <el-option v-for="item in peoples" :key="item.id" :label="item.username" :value="item.username" />
         </el-select>
       </el-form-item>
 
@@ -26,15 +26,16 @@
     <el-row slot="footer" type="flex" justify="center">
       <!-- 列被分为24 -->
       <el-col :span="6">
-        <el-button type="primary" size="small">确定</el-button>
-        <el-button size="small">取消</el-button>
+        <el-button v-loading="loading" type="primary" size="small" @click="submit">确定</el-button>
+        <el-button size="small" @click="handleClose">取消</el-button>
       </el-col>
     </el-row>
   </el-dialog>
 </template>
 
 <script>
-import { getDepartments } from '@/api/departments'
+import { getDepartments, addDepartments } from '@/api/departments'
+import { getEmployeeSimple } from '@/api/employees'
 export default {
   name: 'HrsaasAddDept',
   props: {
@@ -93,13 +94,39 @@ export default {
           { required: true, message: '部门介绍必填', trigger: 'blur' },
           { min: 1, max: 300, message: '部门介绍1-300个字符', trigger: 'blur' }
         ]
-      }
+      },
+      peoples: [],
+      loading: false
     }
   },
   methods: {
     handleClose() {
       this.$emit('update:dialogVisble', false)
       this.$refs.addDeptForm.resetFields()
+      this.formData = {
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '' // 部门介绍
+      }
+    },
+    async getEmployeeSimple() {
+      // const res = await getEmployeeSimple()
+      // console.log(res)
+      this.peoples = await getEmployeeSimple()
+    },
+    async submit() {
+      try {
+        await this.$refs.addDeptForm.validate()
+        this.loading = true
+        await addDepartments({ ...this.formData, pid: this.treeNode.id })
+        this.$message.success('新增成功')
+        this.handleClose()
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
