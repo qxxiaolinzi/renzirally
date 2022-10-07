@@ -1,15 +1,14 @@
 <template>
-  <div class="departments-container">
+  <div v-loading="loading" class="departments-container">
     <el-card>
       <tree-tools :tree-node="company" :is-root="false" @addDept="handleAddDept" />
     </el-card>
 
     <el-tree :data="departs" :props="defaultProps" :default-expand-all="true">
-      <tree-tools slot-scope="{data}" :tree-node="data" @addDept="handleAddDept" />
+      <tree-tools slot-scope="{data}" :tree-node="data" @addDept="handleAddDept" @editDept="editDept" @refreshList="getDepartments" />
     </el-tree>
 
-    <!--! 新增部门 -->
-    <add-dept :dialog-visble.sync="dialogVisble" :tree-node="currentNode" />
+    <add-dept ref="addDept" :dialog-visble.sync="dialogVisble" :tree-node="currentNode" />
   </div>
 </template>
 
@@ -31,7 +30,8 @@ export default {
       defaultProps: {
         label: 'name'
       },
-      company: { name: '江苏传智播客教育科技股份有限公司', manager: '负责人' }
+      company: { name: '江苏传智播客教育科技股份有限公司', manager: '负责人' },
+      loading: false
     }
   },
 
@@ -46,11 +46,16 @@ export default {
   methods: {
     // 拿组织架构大的数据
     async getDepartments() {
-      const { depts, companyManage, companyName } = await getDepartments()
-      // this.departs = depts
-      this.departs = tranListToTreeData(depts, '')
-      this.company = { name: companyName, manager: companyManage }
-      this.company = { name: companyName, manager: '负责人', id: '' }
+      try {
+        this.loading = true
+        const { depts, companyManage, companyName } = await getDepartments()
+        // this.departs = depts
+        this.departs = tranListToTreeData(depts, '')
+        // this.company = { name: companyName, manager: companyManage }
+        this.company = { name: companyName, manager: companyManage, id: '' }
+      } finally {
+        this.loading = false
+      }
     },
     handleAddDept(node) {
       // addDept 显示
@@ -58,6 +63,12 @@ export default {
       // addDept组件 绑定变量 dialogVisble
       this.dialogVisble = true
       this.currentNode = node
+    },
+    editDept(node) {
+      console.log(node)
+      this.dialogVisble = true
+      this.currentNode = { ...node }
+      this.$refs.addDept.formData = { ...node }
     }
 
   }
